@@ -9,9 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2002971150158075714}
+  - component: {fileID: 4616884695932973582}
   - component: {fileID: 5810820039945938650}
   - component: {fileID: 3131378597474002994}
   - component: {fileID: 1748550463118987354}
+  - component: {fileID: 6364950606029136869}
   m_Layer: 0
   m_Name: Basic Boat
   m_TagString: Untagged
@@ -33,6 +35,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4616884695932973582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6161836393281288782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c1e800083594fdcbedd5dd4cecf920, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidbody: {fileID: 3131378597474002994}
+  sailHeightLimit:
+    start: -100
+    finish: 100
 --- !u!212 &5810820039945938650
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -70,8 +88,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 685698221
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 4fdebc38924f0a943b581f807736665d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -118,6 +136,22 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 3.02, y: 3.58}
-  m_Direction: 0
+  m_Offset: {x: 0, y: -0.25}
+  m_Size: {x: 1.85, y: 1.28}
+  m_Direction: 1
+--- !u!114 &6364950606029136869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6161836393281288782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c1e800083594fdcbedd5dd4cecf920, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidbody: {fileID: 3131378597474002994}
+  sailHeightLimit:
+    start: 0
+    finish: 0
