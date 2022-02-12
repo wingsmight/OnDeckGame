@@ -44,6 +44,9 @@ TagManager:
   - name: Sky
     uniqueID: 3416201697
     locked: 0
+  - name: Stars
+    uniqueID: 249368035
+    locked: 0
   - name: Sky Bodies
     uniqueID: 2521953435
     locked: 0
