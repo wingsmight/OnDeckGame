@@ -37,10 +37,6 @@ public class WaterMesh : MonoBehaviour
 
         StartCoroutine(GenerateWaveRoutine());
     }
-    private void OnTriggerStay2D(Collider2D Hit) // process unique buoyancy constant to each object
-    {
-
-    }
     private void FixedUpdate()
     {
         for (int i = 0; i < xPositions.Length; i++)
