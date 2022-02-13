@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5810820039945938650}
   - component: {fileID: 3131378597474002994}
   - component: {fileID: 1748550463118987354}
-  - component: {fileID: 6364950606029136869}
   m_Layer: 0
   m_Name: Basic Boat
   m_TagString: Untagged
@@ -139,19 +138,3 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.25}
   m_Size: {x: 1.85, y: 1.28}
   m_Direction: 1
---- !u!114 &6364950606029136869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6161836393281288782}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0c1e800083594fdcbedd5dd4cecf920, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rigidbody: {fileID: 3131378597474002994}
-  sailHeightLimit:
-    start: 0
-    finish: 0
