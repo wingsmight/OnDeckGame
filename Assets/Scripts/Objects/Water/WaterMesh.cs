@@ -8,6 +8,7 @@ public class WaterMesh : MonoBehaviour
     [SerializeField] private float waveStrength = 1.5f;
     [SerializeField] private float amplitude;
     [SerializeField] private float speed;
+    [SerializeField] private float topOffset;
 
 
     private float waveElementIndex = 0;
@@ -139,7 +140,7 @@ public class WaterMesh : MonoBehaviour
 
             var boxCollider = meshobjects[i].GetComponent<BoxCollider2D>();
             boxCollider.size = new Vector2(xPositions[i + 1] - xPositions[i], yPositions[i] - bottomPosition);
-            boxCollider.offset = new Vector2(xPositions[i] + boxCollider.size.x / 2.0f, yPositions[i] - boxCollider.size.y / 2.0f);
+            boxCollider.offset = new Vector2(xPositions[i] + boxCollider.size.x / 2.0f, (yPositions[i] - boxCollider.size.y / 2.0f) - topOffset);
 
             meshes[i].RecalculateBounds();
         }
