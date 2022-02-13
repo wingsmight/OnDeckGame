@@ -4,40 +4,36 @@ using System.Collections;
 public class WaterMesh : MonoBehaviour
 {
     [SerializeField] private GameObject meshObject;
-    [SerializeField] private float springconstant = 0.02f;
-    [SerializeField] private float damping = 0.04f;
     [SerializeField] private float spread = 0.05f;
     [SerializeField] private float waveStrength = 1.5f;
-    [SerializeField] private float startWavePosition = -100.0f;
     [SerializeField] private float amplitude;
     [SerializeField] private float speed;
 
 
     private float waveElementIndex = 0;
-    private LineRenderer topLine;
 
-    private float[] xpositions;
-    private float[] ypositions;
+    private float[] xPositions;
+    private float[] yPositions;
     private float[] velocities;
-    private float[] accelerations;
 
     private GameObject[] meshobjects;
-    private GameObject[] colliders;
     private Mesh[] meshes;
 
-    private float baseheight;
-    private float left;
-    private float bottom;
-    private float positionZ = -1f;
+    private float bottomPosition;
+    private Vector3 startPosition;
 
 
     private void Awake()
     {
-        this.positionZ = transform.position.z;
+        startPosition = transform.position;
+        transform.position = Vector3.zero;
     }
     private void Start()
     {
         SpawnWater(-10, 20, -2, -6);
+
+        transform.position = startPosition;
+
         StartCoroutine(GenerateWaveRoutine());
     }
     private void OnTriggerStay2D(Collider2D Hit) // process unique buoyancy constant to each object
@@ -46,34 +42,34 @@ public class WaterMesh : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        for (int i = 0; i < xpositions.Length; i++)
+        for (int i = 0; i < xPositions.Length; i++)
         {
-            ypositions[i] = velocities[i];
+            yPositions[i] = velocities[i];
         }
 
-        float[] leftDeltas = new float[xpositions.Length];
-        float[] rightDeltas = new float[xpositions.Length];
+        float[] leftDeltas = new float[xPositions.Length];
+        float[] rightDeltas = new float[xPositions.Length];
 
         for (int j = 0; j < 8; j++)
         {
-            for (int i = 0; i < xpositions.Length; i++)
+            for (int i = 0; i < xPositions.Length; i++)
             {
                 if (i > 0)
                 {
-                    leftDeltas[i] = spread * (ypositions[i] - ypositions[i - 1]);
+                    leftDeltas[i] = spread * (yPositions[i] - yPositions[i - 1]);
                 }
-                if (i < xpositions.Length - 1)
+                if (i < xPositions.Length - 1)
                 {
-                    rightDeltas[i] = spread * (ypositions[i] - ypositions[i + 1]);
+                    rightDeltas[i] = spread * (yPositions[i] - yPositions[i + 1]);
                 }
             }
 
-            for (int i = 0; i < xpositions.Length; i++)
+            for (int i = 0; i < xPositions.Length; i++)
             {
                 if (i > 0)
-                    ypositions[i - 1] += leftDeltas[i];
-                if (i < xpositions.Length - 1)
-                    ypositions[i + 1] += rightDeltas[i];
+                    yPositions[i - 1] += leftDeltas[i];
+                if (i < xPositions.Length - 1)
+                    yPositions[i + 1] += rightDeltas[i];
             }
         }
 
@@ -81,35 +77,24 @@ public class WaterMesh : MonoBehaviour
     }
 
 
-    private void SpawnWater(float Left, float Width, float Top, float Bottom)
+    private void SpawnWater(float left, float width, float topPosition, float bottomPosition)
     {
-        int edgecount = Mathf.RoundToInt(Width) * 5;
+        int edgecount = Mathf.RoundToInt(width) * 5;
         int nodecount = edgecount + 1;
 
-        topLine = gameObject.AddComponent<LineRenderer>();
-        topLine.positionCount = nodecount;
-        topLine.startWidth = 0.1f;
-        topLine.endWidth = 0.1f;
-
-        xpositions = new float[nodecount];
-        ypositions = new float[nodecount];
+        xPositions = new float[nodecount];
+        yPositions = new float[nodecount];
         velocities = new float[nodecount];
-        accelerations = new float[nodecount];
 
         meshobjects = new GameObject[edgecount];
         meshes = new Mesh[edgecount];
-        colliders = new GameObject[edgecount];
 
-        baseheight = Top;
-        bottom = Bottom;
-        left = Left;
+        this.bottomPosition = bottomPosition;
 
         for (int i = 0; i < nodecount; i++)
         {
-            ypositions[i] = Top;
-            xpositions[i] = Left + Width * i / edgecount;
-            topLine.SetPosition(i, new Vector3(xpositions[i], Top, positionZ));
-            accelerations[i] = 0;
+            yPositions[i] = topPosition;
+            xPositions[i] = left + width * i / edgecount;
             velocities[i] = 0;
         }
 
@@ -118,10 +103,10 @@ public class WaterMesh : MonoBehaviour
             meshes[i] = new Mesh();
 
             Vector3[] Vertices = new Vector3[4];
-            Vertices[0] = new Vector3(xpositions[i], ypositions[i], positionZ);
-            Vertices[1] = new Vector3(xpositions[i + 1], ypositions[i + 1], positionZ);
-            Vertices[2] = new Vector3(xpositions[i], bottom, positionZ);
-            Vertices[3] = new Vector3(xpositions[i + 1], bottom, positionZ);
+            Vertices[0] = new Vector3(xPositions[i], yPositions[i], startPosition.z);
+            Vertices[1] = new Vector3(xPositions[i + 1], yPositions[i + 1], startPosition.z);
+            Vertices[2] = new Vector3(xPositions[i], bottomPosition, startPosition.z);
+            Vertices[3] = new Vector3(xPositions[i + 1], bottomPosition, startPosition.z);
 
             Vector2[] UVs = new Vector2[4];
             UVs[0] = new Vector2(0, 1);
@@ -145,16 +130,18 @@ public class WaterMesh : MonoBehaviour
         for (int i = 0; i < meshes.Length; i++)
         {
             Vector3[] Vertices = new Vector3[4];
-            Vertices[0] = new Vector3(xpositions[i], ypositions[i], positionZ);
-            Vertices[1] = new Vector3(xpositions[i + 1], ypositions[i + 1], positionZ);
-            Vertices[2] = new Vector3(xpositions[i], bottom, positionZ);
-            Vertices[3] = new Vector3(xpositions[i + 1], bottom, positionZ);
+            Vertices[0] = new Vector3(xPositions[i], yPositions[i], startPosition.z);
+            Vertices[1] = new Vector3(xPositions[i + 1], yPositions[i + 1], startPosition.z);
+            Vertices[2] = new Vector3(xPositions[i], bottomPosition, startPosition.z);
+            Vertices[3] = new Vector3(xPositions[i + 1], bottomPosition, startPosition.z);
 
             meshes[i].vertices = Vertices;
 
             var boxCollider = meshobjects[i].GetComponent<BoxCollider2D>();
-            boxCollider.size = new Vector2(xpositions[i + 1] - xpositions[i], ypositions[i] - bottom);
-            boxCollider.offset = new Vector2(xpositions[i] + boxCollider.size.x / 2.0f, ypositions[i] - boxCollider.size.y / 2.0f);
+            boxCollider.size = new Vector2(xPositions[i + 1] - xPositions[i], yPositions[i] - bottomPosition);
+            boxCollider.offset = new Vector2(xPositions[i] + boxCollider.size.x / 2.0f, yPositions[i] - boxCollider.size.y / 2.0f);
+
+            meshes[i].RecalculateBounds();
         }
     }
     private IEnumerator GenerateWaveRoutine()
