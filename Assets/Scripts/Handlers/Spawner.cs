@@ -18,6 +18,13 @@ public class Spawner : MonoBehaviour
     {
         Spawn();
     }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            Spawn();
+        }
+    }
 
 
     private void Spawn()

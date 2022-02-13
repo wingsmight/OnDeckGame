@@ -48,12 +48,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_56BE0FD1: 0.8
-    - Vector1_5CB84537: 18
-    - Vector1_745B9376: 3
+    - Vector1_56BE0FD1: 1
+    - Vector1_5CB84537: 0
+    - Vector1_745B9376: 0
     - Vector1_8DA20226: 0
     - Vector1_AE30F744: 0.5
-    - Vector1_AF318A03: 1.4
+    - Vector1_AF318A03: 0
     - _EnableExternalAlpha: 0
     m_Colors:
     - Color_234C1B0B: {r: 0.5872642, g: 0.76221895, b: 0.7830189, a: 0}
