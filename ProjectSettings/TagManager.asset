@@ -65,6 +65,9 @@ TagManager:
   - name: Water
     uniqueID: 685698221
     locked: 0
+  - name: Currency
+    uniqueID: 633751217
+    locked: 0
   - name: Foreground
     uniqueID: 1411021701
     locked: 0

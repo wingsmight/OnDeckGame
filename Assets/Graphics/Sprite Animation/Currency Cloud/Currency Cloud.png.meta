@@ -1,13 +1,25 @@
 fileFormatVersion: 2
-guid: e950c20d87c2f884f8173d8fd33127fe
+guid: 1e39143be77715048a5abb29ef927a6e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8000909404843103043
-    second: Sparks 1_0
+      213: 1572138350018504205
+    second: Currency Cloud_3_0
   - first:
-      213: 4144596611463404509
-    second: Sparks 1_1
+      213: 8052056146014841659
+    second: Currency Cloud_3_1
+  - first:
+      213: -7661470410958591383
+    second: Currency Cloud_3_2
+  - first:
+      213: -8620225743316007640
+    second: Currency Cloud_3_3
+  - first:
+      213: 3289456371943340906
+    second: Currency Cloud_3_4
+  - first:
+      213: -2970444715568560338
+    second: Currency Cloud_3_5
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -52,7 +64,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 400
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -109,13 +121,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Sparks 1_0
+      name: Currency Cloud_3_0
       rect:
         serializedVersion: 2
-        x: 13
-        y: 8
-        width: 13
-        height: 13
+        x: 414
+        y: 1633
+        width: 350
+        height: 274
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -123,20 +135,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 34351cb86b0f80f60800000000000000
-      internalID: 8000909404843103043
+      spriteID: d062f92ff7b51d510800000000000000
+      internalID: 1572138350018504205
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Sparks 1_1
+      name: Currency Cloud_3_1
       rect:
         serializedVersion: 2
-        x: 36
-        y: 8
-        width: 11
-        height: 13
+        x: 1518
+        y: 1582
+        width: 497
+        height: 387
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -144,8 +156,92 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ddb509bb8a0948930800000000000000
-      internalID: 4144596611463404509
+      spriteID: b3b27b63766aebf60800000000000000
+      internalID: 8052056146014841659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Currency Cloud_3_2
+      rect:
+        serializedVersion: 2
+        x: 2610
+        y: 1515
+        width: 670
+        height: 520
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96aa5a1e04dfca590800000000000000
+      internalID: -7661470410958591383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Currency Cloud_3_3
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 252
+        width: 890
+        height: 688
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 825c8fdbb5ece5880800000000000000
+      internalID: -8620225743316007640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Currency Cloud_3_4
+      rect:
+        serializedVersion: 2
+        x: 1268
+        y: 206
+        width: 999
+        height: 772
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6bf3d9542f76ad20800000000000000
+      internalID: 3289456371943340906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Currency Cloud_3_5
+      rect:
+        serializedVersion: 2
+        x: 2447
+        y: 213
+        width: 995
+        height: 766
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e27899fe44cd6c6d0800000000000000
+      internalID: -2970444715568560338
       vertices: []
       indices: 
       edges: []
