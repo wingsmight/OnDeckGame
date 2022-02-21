@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 366535281988057979}
   - component: {fileID: 1198932196903096070}
+  - component: {fileID: 3678933306859536984}
   m_Layer: 0
   m_Name: Wild Island_1
   m_TagString: Untagged
@@ -82,3 +83,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3678933306859536984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150380002515986971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a90c1d4d1a604481bdbcd6c178eeec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
