@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private GameObject spawnObject;
+    [SerializeField] private Boat spawnObject;
 
 
     private Vector3 spawnPosition;
@@ -13,6 +13,7 @@ public class Spawner : MonoBehaviour
     private void Awake()
     {
         spawnPosition = transform.position;
+        spawnObject.OnDestroyed += Spawn;
     }
     private void Start()
     {
@@ -27,8 +28,9 @@ public class Spawner : MonoBehaviour
     }
 
 
-    private void Spawn()
+    public void Spawn()
     {
+        spawnObject.gameObject.SetActive(true);
         spawnObject.transform.position = spawnPosition;
     }
 }

@@ -11,6 +11,7 @@ public class SailSlider : MonoBehaviour
 
     private void Awake()
     {
+        slider.value = boatControl.SailHeight;
         slider.onValueChanged.AddListener(SetSailHeight);
     }
     private void OnDestroy()

@@ -1,47 +1,42 @@
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-[RequireComponent(typeof(LineRenderer), typeof(MeshFilter), typeof(PolygonCollider2D))]
+[RequireComponent(typeof(MeshFilter), typeof(PolygonCollider2D))]
 public class WaterGenerator : MonoBehaviour
 {
-    #region Singleton
-    static WaterGenerator instance;
-    public static WaterGenerator Instance
-    {
-        get => instance;
-    }
+    #region Settings
+    private const float STANDARD_DRAG = 1.05f;
     #endregion
 
     #region Settings
     [Header("Settings")]
-    [SerializeField] bool isBackLane = false;
-    [FormerlySerializedAs("waterColor")] public Color waterColor;
-    public float longitude;
-    public int nodesPerUnit = 5;
-    public float waterDepth;
-    public int despawnDistance = 5;
-    [Min(1)] public int performanceFactor = 2;
+    [FormerlySerializedAs("waterColor")] [SerializeField] private Color waterColor;
+    [SerializeField] private float longitude = 70.0f;
+    [SerializeField] private int nodesPerUnit = 5;
+    [SerializeField] private float waterDepth = 20.0f;
 
     [Header("Physics")]
-    [Range(0, 0.1f)] public float springConstant;
-    [Range(0, 0.1f)] public float damping;
-    [Range(0.0f, .5f)] public float spreadRatio;
-    [Range(1, 10)] public int spreadSpeed;
-    [Range(0.1f, 10.0f)] [SerializeField] private float waveIntensity;
+    [Range(0, 0.1f)] [SerializeField] private float springConstant = 0.02f;
+    [Range(0, 0.1f)] [SerializeField] private float damping = 0.02f;
+    [Range(0.0f, .5f)] [SerializeField] private float spreadRatio = 0.33f;
+    [Range(1, 10)] [SerializeField] private int spreadSpeed = 8;
+    [Range(0.1f, 10.0f)] [SerializeField] private float waveIntensity = 1.0f;
+    [Range(0.0f, 5.0f)] [SerializeField] private float disturbance = 0.4f;
     #endregion
 
     #region References
-    // [Header("References")]
-    private LineRenderer surface;
-    private Mesh mesh;
-    private ParticleSystem particles;
-    private AreaEffector2D effector;
+    [SerializeField] private AreaEffector2D areaEffector;
+    [SerializeField] private new Camera camera;
+    [SerializeField] private PolygonCollider2D polygonCollider;
+    [SerializeField] private MeshRenderer meshRenderer;
     #endregion
 
     #region Private Variables
-    private List<WaterNode> nodes;
+    private List<WaterNode> nodes = new List<WaterNode>();
 
     private float[] leftDeltas;
     private float[] rightDeltas;
@@ -49,111 +44,73 @@ public class WaterGenerator : MonoBehaviour
     private Vector3[] meshVertices;
     private Vector2[] colliderPath;
     private int[] meshTriangles;
-    private Color[] meshColors;
 
     private float positionDelta;
     private float massPerNode;
-    private Queue<Collider2D> interactionQueue;
-    private System.Random random;
+    private Queue<Collider2D> interactionQueue = new Queue<Collider2D>();
     private float time = 0;
-
-    private Camera cam;
-
-    private const float standardDrag = 1.05f;
+    private Vector2 startPointOffset;
+    private Mesh mesh;
     #endregion
 
     #region MonoBehaviour Functions
-
-    private void OnTriggerEnter2D(Collider2D other)
+    private void Awake()
     {
-        if (particles != null)
-        {
-            ParticleSystem.ShapeModule shape = particles.shape;
-            shape.position = other.transform.position - transform.position;
-
-            particles.Play();
-        }
-
-        ReactToCollision(other);
-
-        Vector2 normal = other.attachedRigidbody.velocity.normalized;
-        float crossArea = (normal * other.bounds.size).magnitude;
-        other.attachedRigidbody.drag = standardDrag * crossArea;
+        mesh = new Mesh();
+        startPointOffset = transform.position;
+        transform.position = new Vector3(0, disturbance, 0);
     }
-
-    void OnTriggerStay2D(Collider2D other)
-    {
-        if (!interactionQueue.Contains(other) && other.gameObject.GetComponent<Joint2D>() == null)
-            interactionQueue.Enqueue(other);
-
-        if (Mathf.Abs(other.attachedRigidbody.velocity.x) >= 1 && particles != null)
-        {
-            ParticleSystem.ShapeModule shape = particles.shape;
-            shape.position = other.transform.position - transform.position;
-
-            particles.Play();
-        }
-
-        Vector2 normal = other.attachedRigidbody.velocity.normalized;
-        float crossArea = (normal * other.bounds.size).magnitude;
-        other.attachedRigidbody.drag = standardDrag * crossArea;
-    }
-
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (!other.gameObject.CompareTag("Player"))
-        {
-            Vector2 normal = other.attachedRigidbody.velocity.normalized;
-            float crossArea = (normal * other.bounds.size).magnitude;
-            other.attachedRigidbody.drag = .001f * standardDrag * crossArea;
-        }
-    }
-
-    void Awake()
-    {
-        if (instance is null)
-            instance = this;
-
-        effector = GetComponent<AreaEffector2D>();
-        particles = GetComponent<ParticleSystem>();
-        surface = GetComponent<LineRenderer>();
-        nodes = new List<WaterNode>();
-        interactionQueue = new Queue<Collider2D>();
-        random = new System.Random();
-        cam = Camera.main;
-    }
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         ComputeCoeficients();
         InitializeStructures();
         InitializeSurface();
-        DrawBody();
     }
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         CheckCameraBounds();
     }
-
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        GenerateWaves();
+        time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
+        GenerateWaves(time);
 
         ProcessInteractionQueue();
-        // ReactToCollisions(); 
 
         ApplySpringForces();
-        PropagateWaves();
 
         DrawBody();
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        ReactToCollision(other);
+
+        Vector2 normal = other.attachedRigidbody.velocity.normalized;
+        float crossArea = (normal * other.bounds.size).magnitude;
+        other.attachedRigidbody.drag = STANDARD_DRAG * crossArea;
+    }
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (!interactionQueue.Contains(other) && other.gameObject.GetComponent<Joint2D>() == null)
+            interactionQueue.Enqueue(other);
+
+        Vector2 normal = other.attachedRigidbody.velocity.normalized;
+        float crossArea = (normal * other.bounds.size).magnitude;
+        other.attachedRigidbody.drag = STANDARD_DRAG * crossArea;
+    }
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.TryGetComponent<Boat>(out Boat boat))
+        {
+            Vector2 normal = other.attachedRigidbody.velocity.normalized;
+            float crossArea = (normal * other.bounds.size).magnitude;
+            other.attachedRigidbody.drag = .001f * STANDARD_DRAG * crossArea;
+        }
     }
     #endregion
 
     #region Buoyancy Forces Computations
-    void ProcessInteractionQueue()
+    private void ProcessInteractionQueue()
     {
         while (interactionQueue.Count > 0)
         {
@@ -161,24 +118,13 @@ public class WaterGenerator : MonoBehaviour
 
             if (obj != null && !obj.gameObject.CompareTag("IgnoreWater"))
             {
-                // if (!obj.attachedRigidbody.freezeRotation)
-                // {
                 AccuratePhysics(obj);
-                // }
-                // else
-                // {
-                //     // SimplifiedPhysics(obj);
-                // }
-
-                // ReactToCollision(obj);
             }
         }
     }
-    void SimplifiedPhysics(Collider2D other)
+    private void SimplifiedPhysics(Collider2D other)
     {
         Rigidbody2D rb = other.attachedRigidbody;
-        PolygonCollider2D waterBody = GetComponent<PolygonCollider2D>();
-
         Vector2 center = rb.worldCenterOfMass;
         Vector2 size = GetColliderSize(other);
 
@@ -198,13 +144,13 @@ public class WaterGenerator : MonoBehaviour
         float volumePerDivision = size.x * size.y / centroids.Length;
         foreach (Vector2 centroid in centroids)
         {
-            if (waterBody.OverlapPoint(centroid))
+            if (polygonCollider.OverlapPoint(centroid))
                 volume += volumePerDivision;
         }
 
         float fluidDensity = 1f;
         float dragCoefficient = .38f;
-        float crossSection = rb.velocity.y > 0 ? other.bounds.size.x : other.bounds.size.y; // this one might need a better solution
+        float crossSection = rb.velocity.y > 0 ? other.bounds.size.x : other.bounds.size.y;
 
         Vector2 buoyancy = -fluidDensity * Physics2D.gravity * volume;
         float drag = .5f * rb.velocity.sqrMagnitude * dragCoefficient * crossSection;
@@ -212,11 +158,9 @@ public class WaterGenerator : MonoBehaviour
         rb.AddForce(-drag * rb.velocity.normalized);
         rb.AddForce(buoyancy);
     }
-    void AccuratePhysics(Collider2D other)
+    private void AccuratePhysics(Collider2D other)
     {
         Rigidbody2D rb = other.attachedRigidbody;
-        PolygonCollider2D waterBody = GetComponent<PolygonCollider2D>();
-
         Vector2 center = rb.worldCenterOfMass;
         Vector2 size = GetColliderSize(other);
 
@@ -243,38 +187,24 @@ public class WaterGenerator : MonoBehaviour
             // Add contact points between water & collider
             var (p1, p2) = FindIntersectionsOnSurface(vertices, rb.rotation, upperCornerIndex);
 
-            // Debug.Log($"Intersections: {intersections[0]} {intersections[1]}");
-            // Debug.Log($"Submerged Area (approx.): {(intersections[0].y -(center.y - size.y/2)) * size.x}");
-
             // Remove unsubmerged vertices
-            vertices.RemoveAll(vertex => !waterBody.OverlapPoint(vertex));
+            vertices.RemoveAll(vertex => !polygonCollider.OverlapPoint(vertex));
 
             vertices.Insert(0, p1);
             vertices.Insert(1, p2);
         }
 
-        // Debug.Log("Vertices:");
-        // foreach (var vertex in vertices)
-        //     Debug.Log(vertex);
-
-        // Split the unsubmerged volume into triangles
         List<int> triangles = SplitIntoTriangles(vertices);
 
-        // Compute the submerged volume & its centroid
         Vector2 centroid = ComputeCentroid(vertices, triangles, out volume);
 
-        // Debug.Log($"Buoyancy Centroid: {centroid}\nSubmerged Volume: {volume}");
-
-        float fluidDensity = 1f;
+        float fluidDensity = 0.7f;
         Vector2 buoyancy = -fluidDensity * Physics2D.gravity * volume;
 
         if (volume != 0 && !float.IsNaN(centroid.x) && !float.IsNaN(centroid.y))
-            rb.AddForceAtPosition(buoyancy, centroid);
-
-        // print($"Buoyancy: {buoyancy}\nWeight: {Physics2D.gravity * rb.mass}");
-        // print($"1/2 A Triangle Area: {ComputeTriangleArea(new Vector2(0,0),new Vector2(0,1),new Vector2(1,0))}");
+            rb.AddForceAtPosition(buoyancy, new Vector2(rb.position.x - (leftNode.position.y - rightNode.position.y), rb.position.y));
     }
-    (Vector2 p1, Vector2 p2) FindIntersectionsOnSurface(List<Vector2> vertices, float rotation, int topIndex)
+    private (Vector2 p1, Vector2 p2) FindIntersectionsOnSurface(List<Vector2> vertices, float rotation, int topIndex)
     {
         Vector2 upperCorner = vertices[(topIndex) % 4];
         Vector2 leftCorner = vertices[(topIndex + 3) % 4];
@@ -362,12 +292,11 @@ public class WaterGenerator : MonoBehaviour
 
         return (p1, p2);
     }
-    List<int> SplitIntoTriangles(List<Vector2> vertices)
+    private List<int> SplitIntoTriangles(List<Vector2> vertices)
     {
         List<int> triangles = new List<int>();
         int origin = 0;
 
-        // print($"Vertex Count: {vertices.Count}");
         for (int i = 1; i < vertices.Count - 1; i++)
         {
             triangles.AddRange(new int[] {
@@ -377,7 +306,7 @@ public class WaterGenerator : MonoBehaviour
 
         return triangles;
     }
-    float ComputeTriangleArea(Vector2 p1, Vector2 p2, Vector2 p3)
+    private float ComputeTriangleArea(Vector2 p1, Vector2 p2, Vector2 p3)
     {
         float[,] matrix = new float[,] {
                 {p1.x, p1.y, 1},
@@ -387,12 +316,11 @@ public class WaterGenerator : MonoBehaviour
 
         return Mathf.Abs(Compute3x3Determinant(matrix)) / 2;
     }
-    Vector2 ComputeCentroid(List<Vector2> vertices, List<int> triangles, out float area)
+    private Vector2 ComputeCentroid(List<Vector2> vertices, List<int> triangles, out float area)
     {
         Vector2 centroid = Vector2.zero;
         area = 0;
 
-        // print($"Triangle Count: {triangles.Count}");
         for (int i = 0; i < triangles.Count; i += 3)
         {
             Vector2 tCentroid = ComputeTriangleCentroid(
@@ -407,20 +335,18 @@ public class WaterGenerator : MonoBehaviour
                 vertices[triangles[i + 2]]
             );
 
-            // Debug.Log($"tArea: {tArea}");
             centroid += tArea * tCentroid;
             area += tArea;
         }
-        // Debug.Log($"Sum of centroids*area: {centroid}\nTotal area: {area}");
         centroid = centroid / area;
 
         return centroid;
     }
-    Vector2 ComputeTriangleCentroid(Vector2 p1, Vector2 p2, Vector2 p3)
+    private Vector2 ComputeTriangleCentroid(Vector2 p1, Vector2 p2, Vector2 p3)
     {
         return (p1 + p2 + p3) / 3;
     }
-    float Compute3x3Determinant(float[,] matrix)
+    private float Compute3x3Determinant(float[,] matrix)
     {
         if (matrix.Length != 9)
             throw new System.Exception("Matrix is not 3x3");
@@ -431,22 +357,19 @@ public class WaterGenerator : MonoBehaviour
 
         return det;
     }
-    public static Vector2 GetColliderSize(Collider2D other)
+    private Vector2 GetColliderSize(Collider2D other)
     {
         Vector2 size = Vector2.zero;
 
         switch (other)
         {
             case BoxCollider2D box:
-                // Debug.Log("It's a box");
                 size = box.size;
                 break;
             case CapsuleCollider2D capsule:
-                // Debug.Log("It's a capsule");
                 size = capsule.size;
                 break;
             case CircleCollider2D circle:
-                // Debug.Log("It's a circle");
                 size = circle.radius * Vector2.one;
                 break;
             default:
@@ -458,7 +381,7 @@ public class WaterGenerator : MonoBehaviour
         return size * other.transform.localScale;
 
     }
-    (WaterNode leftNode, WaterNode rightNode) FindClosestSegment(Vector2 point)
+    private (WaterNode leftNode, WaterNode rightNode) FindClosestSegment(Vector2 point)
     {
         #region Binary Search
         int i;
@@ -496,10 +419,9 @@ public class WaterGenerator : MonoBehaviour
 
 
         return (null, null);
-        // throw new System.Exception("Was unable to find closest segment to the node.");
         #endregion
     }
-    void ComputeCoeficients()
+    private void ComputeCoeficients()
     {
         positionDelta = 1f / nodesPerUnit;
         massPerNode = (1f / nodesPerUnit) * waterDepth;
@@ -507,22 +429,52 @@ public class WaterGenerator : MonoBehaviour
     #endregion
 
     #region Surface Control
-    void CheckCameraBounds()
+    private void CheckCameraBounds()
     {
-        Vector2 WorldUnitsInCamera;
-        WorldUnitsInCamera.y = cam.orthographicSize * 2;
-        WorldUnitsInCamera.x = WorldUnitsInCamera.y * Screen.width / Screen.height;
+        var vertExtent = camera.orthographicSize;
+        var horzExtent = vertExtent * Screen.width / Screen.height;
 
-        Vector2 leftMostPos = nodes[0].position;
-        float bound = Camera.main.transform.position.x - WorldUnitsInCamera.x / 2 - despawnDistance;
+        var cameraMinPosX = -horzExtent + camera.transform.position.x;
+        var cameraMaxPosX = horzExtent + camera.transform.position.x;
 
-        if (leftMostPos.x < bound)
+        var minNodePosX = nodes[0].position.x + positionDelta;
+        var maxNodePosX = nodes[nodes.Count - 1].position.x - positionDelta;
+
+        if (minNodePosX > cameraMinPosX)
         {
-            for (int i = 0; i < bound - leftMostPos.x; i++) CycleNodes();
+            for (int i = 0; i < minNodePosX - cameraMinPosX; i++)
+            {
+                PlaceNodesBackward();
+            }
+        }
+        else if (maxNodePosX < cameraMaxPosX)
+        {
+            for (int i = 0; i < cameraMaxPosX - maxNodePosX; i++)
+            {
+                PlaceNodesForward();
+            }
         }
     }
+    private void PlaceNodesBackward()
+    {
+        float disturbance;
+        WaterNode cycledNode;
+        for (int i = 1; i <= nodesPerUnit; i++)
+        {
+            cycledNode = nodes[nodes.Count - 1];
+            nodes.Remove(cycledNode);
 
-    public void CycleNodes()
+            disturbance = waveIntensity * Mathf.Sin(time);
+
+            cycledNode.position.x = nodes[0].position.x - (positionDelta);
+            cycledNode.position.y = transform.position.y + disturbance;
+
+            nodes.Insert(0, cycledNode);
+
+            time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
+        }
+    }
+    private void PlaceNodesForward()
     {
         float disturbance;
         WaterNode cycledNode;
@@ -531,7 +483,7 @@ public class WaterGenerator : MonoBehaviour
             cycledNode = nodes[0];
             nodes.Remove(cycledNode);
 
-            disturbance = waveIntensity * (isBackLane ? Mathf.Cos(time) : Mathf.Sin(time));
+            disturbance = waveIntensity * Mathf.Sin(time);
 
             cycledNode.position.x = nodes[nodes.Count - 1].position.x + (positionDelta);
             cycledNode.position.y = transform.position.y + disturbance;
@@ -541,24 +493,24 @@ public class WaterGenerator : MonoBehaviour
             time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
         }
     }
-
-    void GenerateWaves()
+    private void GenerateWaves(float offsetX)
     {
-        float disturbance = waveIntensity * (isBackLane ? Mathf.Cos(time) : Mathf.Sin(time));
-        time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
-
-        nodes[nodes.Count - 1].Disturb(disturbance);
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            var positionX = nodes[i].position.x;
+            var positionY = waveIntensity * Mathf.Sin(positionX + offsetX);
+            nodes[i].position = new Vector2(positionX, positionY);
+        }
     }
-    void ApplySpringForces()
+    private void ApplySpringForces()
     {
         for (int i = 0; i < nodes.Count; i++)
         {
             if (i < nodes.Count - 1)
                 nodes[i].Update(springConstant, damping, massPerNode);
-            surface.SetPosition(i, nodes[i].position);
         }
     }
-    void PropagateWaves()
+    private void PropagateWaves()
     {
         // do some passes where nodes pull on their neighbours
         for (int j = 0; j < spreadSpeed; j++)
@@ -586,7 +538,7 @@ public class WaterGenerator : MonoBehaviour
             }
         }
     }
-    void ReactToCollisions()
+    private void ReactToCollisions()
     {
         Dictionary<Collider2D, List<WaterNode>> splashedNodes = new Dictionary<Collider2D, List<WaterNode>>();
 
@@ -624,7 +576,7 @@ public class WaterGenerator : MonoBehaviour
                 node.Splash(massPerSplash, velocity, massPerNode);
         }
     }
-    void ReactToCollision(Collider2D splasher)
+    private void ReactToCollision(Collider2D splasher)
     {
         int start = Mathf.FloorToInt((splasher.bounds.center.x - splasher.bounds.extents.x) - nodes[0].position.x) * nodesPerUnit;
         int end = Mathf.CeilToInt((splasher.bounds.center.x + splasher.bounds.extents.x) - nodes[0].position.x) * nodesPerUnit;
@@ -660,98 +612,59 @@ public class WaterGenerator : MonoBehaviour
     #endregion
 
     #region Draw Functions
-    void InitializeSurface()
+    private void InitializeSurface()
     {
         int nodeAmount = ((int)(longitude * nodesPerUnit));
 
         positionDelta = 1f / nodesPerUnit;
-        surface.positionCount = nodeAmount + 1;
 
-        List<Vector3> positions = new List<Vector3>();
         for (int count = 0; count <= nodeAmount / 2; count++)
         {
             Vector2 rightPosition = (Vector2)transform.position + Vector2.right * (positionDelta * count);
             Vector2 leftPosition = (Vector2)transform.position + Vector2.left * (positionDelta * count);
 
-            nodes.Add(new WaterNode(rightPosition));
-            positions.Add(rightPosition);
-
+            nodes.Add(new WaterNode(rightPosition, disturbance));
             if (count > 0)
             {
-                nodes.Insert(0, new WaterNode(leftPosition));
-                positions.Insert(0, rightPosition);
+                nodes.Insert(0, new WaterNode(leftPosition, disturbance));
             }
         }
-        surface.SetPositions(positions.ToArray());
     }
-    void InitializeStructures()
+    private void InitializeStructures()
     {
         int nodeAmount = ((int)(longitude * nodesPerUnit)) + 1;
 
         leftDeltas = new float[nodeAmount];
         rightDeltas = new float[nodeAmount];
 
-        mesh = new Mesh();
-
-        meshVertices = new Vector3[2 * nodeAmount];
-        colliderPath = new Vector2[nodeAmount / performanceFactor + 3];
-
-        meshTriangles = new int[6 * (nodeAmount)];
-        for (int i = 1; i < nodeAmount; i++)
-        {
-            meshTriangles[6 * (i - 1)] = 0 + (i - 1) * 2;
-            meshTriangles[6 * (i - 1) + 1] = 2 + (i - 1) * 2;
-            meshTriangles[6 * (i - 1) + 2] = 1 + (i - 1) * 2;
-
-            meshTriangles[6 * (i - 1) + 3] = 2 + (i - 1) * 2;
-            meshTriangles[6 * (i - 1) + 4] = 3 + (i - 1) * 2;
-            meshTriangles[6 * (i - 1) + 5] = 1 + (i - 1) * 2;
-        }
-
-        meshColors = new Color[2 * nodeAmount];
-        for (int i = 0; i < meshColors.Length; i++)
-            meshColors[i] = waterColor;
+        meshVertices = new Vector3[nodeAmount * 2];
     }
-    void DrawBody()
+    private void DrawBody()
     {
-        Vector3 node;
         for (int i = 0; i < nodes.Count; i++)
         {
-            // Weave the mesh by adding the nodes in pairs from left to right
-            // First the upper node
-            node = (Vector3)nodes[i].position - transform.position;
-            meshVertices[2 * i] = node;
-            if (i % performanceFactor == 0) colliderPath[i / performanceFactor] = node;
-
-            // Then the lower node
-            node.y = transform.position.y - waterDepth;
-            meshVertices[2 * i + 1] = node;
+            meshVertices[i] = nodes[i].position - new Vector2(0, transform.position.y);
+            meshVertices[meshVertices.Length - i - 1] = new Vector2(nodes[i].position.x, -waterDepth);
         }
 
-#if UNITY_EDITOR
-        for (int i = 0; i < meshColors.Length; i++)
-            meshColors[i] = waterColor;
-#endif
+        meshRenderer.sortingLayerName = "Water";
+        meshRenderer.sortingOrder = 10;
 
-        // Add the two last nodes that close the polygon properly, and that give it depth.
-        colliderPath[nodes.Count / performanceFactor] = meshVertices[2 * nodes.Count - 2];
-        colliderPath[nodes.Count / performanceFactor + 1] = meshVertices[2 * nodes.Count - 1];
-        colliderPath[nodes.Count / performanceFactor + 2] = meshVertices[1];
+        polygonCollider.SetPath(0, meshVertices.Select(x => new Vector2(x.x, x.y)).ToList());
+        polygonCollider.offset = startPointOffset;
 
         mesh.Clear();
-        mesh.vertices = meshVertices;
-        mesh.triangles = meshTriangles;
+        mesh = polygonCollider.CreateMesh(true, true);
+
+        var meshColors = new Color[mesh.vertexCount];
+        for (int i = 0; i < mesh.vertexCount; i++)
+        {
+            meshColors[i] = waterColor;
+        }
         mesh.colors = meshColors;
 
         mesh.RecalculateNormals();
-
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
-        renderer.sortingLayerName = "Water";
-        renderer.sortingOrder = 10;
-
         GetComponent<MeshFilter>().mesh = mesh;
-        GetComponent<PolygonCollider2D>().SetPath(0, colliderPath);
-
     }
     #endregion
 
