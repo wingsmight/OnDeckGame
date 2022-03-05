@@ -52,6 +52,7 @@ MonoBehaviour:
     start: 0
     finish: 100
   animator: {fileID: 5507976651717583628}
+  collider: {fileID: 1255183585606301540}
 --- !u!95 &5507976651717583628
 Animator:
   serializedVersion: 3
@@ -134,8 +135,8 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.95
-  m_LinearDrag: 0
+  m_Mass: 2
+  m_LinearDrag: 1
   m_AngularDrag: 4
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -156,6 +157,6 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.013476046, y: -0.25000003}
-  m_Size: {x: 1.6936836, y: 1.2800032}
+  m_Offset: {x: -0.013476046, y: -0.76}
+  m_Size: {x: 1.36, y: 0.25}
   m_Direction: 1

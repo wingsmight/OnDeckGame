@@ -9,7 +9,7 @@ using UnityEngine.Serialization;
 public class WaterGenerator : MonoBehaviour
 {
     #region Settings
-    private const float STANDARD_DRAG = 1.05f;
+    [SerializeField] private float STANDARD_DRAG = 1.05f;
     #endregion
 
     #region Settings
@@ -26,10 +26,13 @@ public class WaterGenerator : MonoBehaviour
     [Range(1, 10)] [SerializeField] private int spreadSpeed = 8;
     [Range(0.1f, 10.0f)] [SerializeField] private float waveIntensity = 1.0f;
     [Range(0.0f, 5.0f)] [SerializeField] private float disturbance = 0.4f;
+    [Range(0.0f, 50.0f)] [SerializeField] private float buoyancyForce = 10.0f;
+    [Range(0.0f, 100.0f)] [SerializeField] private float depthForce = 40.0f;
+    [Range(0.0f, 20.0f)] [SerializeField] private float airDrag = 0.0f;
+    [Range(0.0f, 20.0f)] [SerializeField] private float airGravityScale = 1.0f;
     #endregion
 
     #region References
-    [SerializeField] private AreaEffector2D areaEffector;
     [SerializeField] private new Camera camera;
     [SerializeField] private PolygonCollider2D polygonCollider;
     [SerializeField] private MeshRenderer meshRenderer;
@@ -51,6 +54,7 @@ public class WaterGenerator : MonoBehaviour
     private float time = 0;
     private Vector2 startPointOffset;
     private Mesh mesh;
+    private bool isInsideWater = false;
     #endregion
 
     #region MonoBehaviour Functions
@@ -77,39 +81,41 @@ public class WaterGenerator : MonoBehaviour
 
         ProcessInteractionQueue();
 
-        ApplySpringForces();
-
         DrawBody();
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        ReactToCollision(other);
-
-        Vector2 normal = other.attachedRigidbody.velocity.normalized;
-        float crossArea = (normal * other.bounds.size).magnitude;
-        other.attachedRigidbody.drag = STANDARD_DRAG * crossArea;
+        isInsideWater = true;
     }
     private void OnTriggerStay2D(Collider2D other)
     {
         if (!interactionQueue.Contains(other) && other.gameObject.GetComponent<Joint2D>() == null)
             interactionQueue.Enqueue(other);
-
-        Vector2 normal = other.attachedRigidbody.velocity.normalized;
-        float crossArea = (normal * other.bounds.size).magnitude;
-        other.attachedRigidbody.drag = STANDARD_DRAG * crossArea;
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (!other.TryGetComponent<Boat>(out Boat boat))
+        isInsideWater = false;
+
+        if (other.TryGetComponent<Boat>(out Boat boat))
         {
-            Vector2 normal = other.attachedRigidbody.velocity.normalized;
-            float crossArea = (normal * other.bounds.size).magnitude;
-            other.attachedRigidbody.drag = .001f * STANDARD_DRAG * crossArea;
+            ExitFromWater(other);
         }
     }
     #endregion
 
     #region Buoyancy Forces Computations
+    private void ExitFromWater(Collider2D other)
+    {
+        Vector2 normal = other.attachedRigidbody.velocity.normalized;
+        float crossArea = (normal * other.bounds.size).magnitude;
+        other.attachedRigidbody.drag = airDrag;// * STANDARD_DRAG * crossArea;
+        other.attachedRigidbody.gravityScale = airGravityScale;
+    }
+    public float GetWavePoint(float x)
+    {
+        return waveIntensity * Mathf.Sin(x);
+    }
+
     private void ProcessInteractionQueue()
     {
         while (interactionQueue.Count > 0)
@@ -122,44 +128,14 @@ public class WaterGenerator : MonoBehaviour
             }
         }
     }
-    private void SimplifiedPhysics(Collider2D other)
-    {
-        Rigidbody2D rb = other.attachedRigidbody;
-        Vector2 center = rb.worldCenterOfMass;
-        Vector2 size = GetColliderSize(other);
-
-        Vector2[] centroids = new Vector2[] {
-                center,
-                center + (size * (Vector2.up) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.left) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.right) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.down) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.up + Vector2.left) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.up + Vector2.right) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.down + Vector2.right) / 4).Rotate(rb.rotation),
-                center + (size * (Vector2.down + Vector2.left) / 4).Rotate(rb.rotation)
-            };
-
-        float volume = 0;
-        float volumePerDivision = size.x * size.y / centroids.Length;
-        foreach (Vector2 centroid in centroids)
-        {
-            if (polygonCollider.OverlapPoint(centroid))
-                volume += volumePerDivision;
-        }
-
-        float fluidDensity = 1f;
-        float dragCoefficient = .38f;
-        float crossSection = rb.velocity.y > 0 ? other.bounds.size.x : other.bounds.size.y;
-
-        Vector2 buoyancy = -fluidDensity * Physics2D.gravity * volume;
-        float drag = .5f * rb.velocity.sqrMagnitude * dragCoefficient * crossSection;
-
-        rb.AddForce(-drag * rb.velocity.normalized);
-        rb.AddForce(buoyancy);
-    }
     private void AccuratePhysics(Collider2D other)
     {
+        if (!isInsideWater)
+        {
+            ExitFromWater(other);
+            return;
+        }
+
         Rigidbody2D rb = other.attachedRigidbody;
         Vector2 center = rb.worldCenterOfMass;
         Vector2 size = GetColliderSize(other);
@@ -198,11 +174,19 @@ public class WaterGenerator : MonoBehaviour
 
         Vector2 centroid = ComputeCentroid(vertices, triangles, out volume);
 
+        float immersionDepth = leftNode.position.y - center.y;
         float fluidDensity = 0.7f;
-        Vector2 buoyancy = -fluidDensity * Physics2D.gravity * volume;
+        Vector2 buoyancy = -fluidDensity * Physics2D.gravity * volume * buoyancyForce;
+
+        Vector2 normal = rb.velocity.normalized;
+        float crossArea = (normal * other.bounds.size).magnitude;
+        float referencePoint = (leftNode.position.y + rightNode.position.y) / 2.0f;
+        float depth = referencePoint - centroid.y;
+        rb.drag = STANDARD_DRAG * crossArea * (1 - Mathf.Clamp01(depth * depthForce));
+        rb.gravityScale = 1.0f;
 
         if (volume != 0 && !float.IsNaN(centroid.x) && !float.IsNaN(centroid.y))
-            rb.AddForceAtPosition(buoyancy, new Vector2(rb.position.x - (leftNode.position.y - rightNode.position.y), rb.position.y));
+            rb.AddForceAtPosition(buoyancy, new Vector2(rb.position.x - (leftNode.position.y - rightNode.position.y), rb.position.y), ForceMode2D.Force);
     }
     private (Vector2 p1, Vector2 p2) FindIntersectionsOnSurface(List<Vector2> vertices, float rotation, int topIndex)
     {
@@ -373,7 +357,7 @@ public class WaterGenerator : MonoBehaviour
                 size = circle.radius * Vector2.one;
                 break;
             default:
-                Debug.LogError("Floating collider fell into generic case");
+                //Debug.LogError("Floating collider fell into generic case");
                 size = other.bounds.size;
                 break;
         }
@@ -464,7 +448,7 @@ public class WaterGenerator : MonoBehaviour
             cycledNode = nodes[nodes.Count - 1];
             nodes.Remove(cycledNode);
 
-            disturbance = waveIntensity * Mathf.Sin(time);
+            disturbance = GetWavePoint(time);
 
             cycledNode.position.x = nodes[0].position.x - (positionDelta);
             cycledNode.position.y = transform.position.y + disturbance;
@@ -483,7 +467,7 @@ public class WaterGenerator : MonoBehaviour
             cycledNode = nodes[0];
             nodes.Remove(cycledNode);
 
-            disturbance = waveIntensity * Mathf.Sin(time);
+            disturbance = GetWavePoint(time);
 
             cycledNode.position.x = nodes[nodes.Count - 1].position.x + (positionDelta);
             cycledNode.position.y = transform.position.y + disturbance;
@@ -498,7 +482,7 @@ public class WaterGenerator : MonoBehaviour
         for (int i = 0; i < nodes.Count; i++)
         {
             var positionX = nodes[i].position.x;
-            var positionY = waveIntensity * Mathf.Sin(positionX + offsetX);
+            var positionY = GetWavePoint(positionX + offsetX);
             nodes[i].position = new Vector2(positionX, positionY);
         }
     }

@@ -11,6 +11,7 @@ public class Boat : MonoBehaviour
     [SerializeField] private new Rigidbody2D rigidbody;
     [SerializeField] private Span sailHeightLimit;
     [SerializeField] private Animator animator;
+    [SerializeField] private new Collider2D collider;
 
 
     public event Action OnDestroyed;
@@ -55,4 +56,5 @@ public class Boat : MonoBehaviour
 
     public Rigidbody2D Rigidbody => rigidbody;
     public Span SailHeightLimit => sailHeightLimit;
+    public Collider2D Collider => collider;
 }
