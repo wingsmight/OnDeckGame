@@ -7,8 +7,6 @@ public class BoatControl : MonoBehaviour
     [SerializeField] private Boat boat;
     [SerializeField] private float sailRigidity = 1.0f;
     [SerializeField] private Vector2 calmForce = new Vector2(1.0f, 0.0f);
-    [SerializeField] private Collider2D waterCollider;
-    [SerializeField] private ForceMode2D forceMode;
 
 
     private float sailHeight;
@@ -26,7 +24,7 @@ public class BoatControl : MonoBehaviour
 
     private void MoveSail(float height)
     {
-        boat.Rigidbody.AddForce(calmForce * sailRigidity * height, forceMode);
+        boat.Rigidbody.AddForce(calmForce * sailRigidity * height, ForceMode2D.Impulse);
     }
 
 

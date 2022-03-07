@@ -24,7 +24,7 @@ public class WaterGenerator : MonoBehaviour
     [Range(0, 0.1f)] [SerializeField] private float damping = 0.02f;
     [Range(0.0f, .5f)] [SerializeField] private float spreadRatio = 0.33f;
     [Range(1, 10)] [SerializeField] private int spreadSpeed = 8;
-    [Range(0.1f, 10.0f)] [SerializeField] private float waveIntensity = 1.0f;
+    [Range(0.1f, 10.0f)] [SerializeField] private float amplitude = 1.0f;
     [Range(0.0f, 5.0f)] [SerializeField] private float disturbance = 0.4f;
     [Range(0.0f, 50.0f)] [SerializeField] private float buoyancyForce = 10.0f;
     [Range(0.0f, 100.0f)] [SerializeField] private float depthForce = 40.0f;
@@ -54,7 +54,6 @@ public class WaterGenerator : MonoBehaviour
     private float time = 0;
     private Vector2 startPointOffset;
     private Mesh mesh;
-    private bool isInsideWater = false;
     #endregion
 
     #region MonoBehaviour Functions
@@ -83,23 +82,16 @@ public class WaterGenerator : MonoBehaviour
 
         DrawBody();
     }
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        isInsideWater = true;
-    }
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (!interactionQueue.Contains(other) && other.gameObject.GetComponent<Joint2D>() == null)
+        if (!interactionQueue.Contains(other))
+        {
             interactionQueue.Enqueue(other);
+        }
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        isInsideWater = false;
-
-        if (other.TryGetComponent<Boat>(out Boat boat))
-        {
-            ExitFromWater(other);
-        }
+        ExitFromWater(other);
     }
     #endregion
 
@@ -113,7 +105,7 @@ public class WaterGenerator : MonoBehaviour
     }
     public float GetWavePoint(float x)
     {
-        return waveIntensity * Mathf.Sin(x);
+        return amplitude * Mathf.Sin(x);
     }
 
     private void ProcessInteractionQueue()
@@ -130,12 +122,6 @@ public class WaterGenerator : MonoBehaviour
     }
     private void AccuratePhysics(Collider2D other)
     {
-        if (!isInsideWater)
-        {
-            ExitFromWater(other);
-            return;
-        }
-
         Rigidbody2D rb = other.attachedRigidbody;
         Vector2 center = rb.worldCenterOfMass;
         Vector2 size = GetColliderSize(other);
@@ -667,4 +653,7 @@ public class WaterGenerator : MonoBehaviour
 #endif
     }
     #endregion
+
+
+    public float Amplitude { get => amplitude; set => amplitude = value; }
 }

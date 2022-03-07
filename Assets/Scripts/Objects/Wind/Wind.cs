@@ -19,15 +19,12 @@ public class Wind : MonoBehaviour
 
 
     private Coroutine fadeSoundCoroutine;
+    private Coroutine switchCoroutine;
 
 
     private void Awake()
     {
         areaEffector.enabled = true;
-    }
-    private void Start()
-    {
-        StartCoroutine(SwitchRandomlyRoutine());
     }
     private void Update()
     {
@@ -44,6 +41,7 @@ public class Wind : MonoBehaviour
         areaEffector.enabled = true;
         areaEffector.forceVariation = strengthSpread;
 
+        audioSource.volume = 0.0f;
         audioSource.clip = sound;
         audioSource.loop = true;
         audioSource.time = Random.Range(0.0f, sound.length);
@@ -67,8 +65,21 @@ public class Wind : MonoBehaviour
         }
         fadeSoundCoroutine = StartCoroutine(audioSource.FadeVolumeRoutine(0.0f, changeStateDuration));
     }
+    public void StartSwitchBehaviour()
+    {
+        StopSwitchBehaviour();
+        switchCoroutine = StartCoroutine(SwitchRandomlyRoutine());
+    }
+    public void StopSwitchBehaviour()
+    {
+        Disable();
+        if (switchCoroutine != null)
+        {
+            StopCoroutine(switchCoroutine);
+        }
+    }
 
-    public IEnumerator ChangeForceSmoothlyRoutine(float startForce, float finishForce, float duration)
+    private IEnumerator ChangeForceSmoothlyRoutine(float startForce, float finishForce, float duration)
     {
         float timeElapsed = 0.0f;
         while (timeElapsed < duration)
@@ -85,15 +96,15 @@ public class Wind : MonoBehaviour
     {
         while (true)
         {
-            Disable();
-
-            var randomCalmDuration = Random.Range(calmDuration - durationSpread, calmDuration + durationSpread);
-            yield return new WaitForSeconds(randomCalmDuration);
-
             Enable();
 
             var randomWindDuration = Random.Range(windDuration - durationSpread, windDuration + durationSpread);
             yield return new WaitForSeconds(randomWindDuration);
+
+            Disable();
+
+            var randomCalmDuration = Random.Range(calmDuration - durationSpread, calmDuration + durationSpread);
+            yield return new WaitForSeconds(randomCalmDuration);
         }
     }
 
