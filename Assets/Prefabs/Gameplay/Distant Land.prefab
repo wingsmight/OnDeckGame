@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6817621328817383712}
   - component: {fileID: 6817621328817383713}
+  - component: {fileID: 359611871}
   m_Layer: 0
   m_Name: Distant Land_1
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 6817621328817383726}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 26.19, y: -1.06, z: 831.8787}
-  m_LocalScale: {x: 1.195589, y: 1.195589, z: 1.195589}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1}
   m_Children: []
   m_Father: {fileID: 6817621329354356790}
   m_RootOrder: 0
@@ -82,6 +83,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &359611871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6817621328817383726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2433c067a0d247c19387740e4b2cb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 0}
+  parallaxEffect: -0.33
 --- !u!1 &6817621329354356791
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,7 +112,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6817621329354356790
 Transform:
   m_ObjectHideFlags: 0
