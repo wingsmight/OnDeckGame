@@ -551,6 +551,7 @@ MonoBehaviour:
   rightLimit: 1e+20
   bottomLimit: 0.9672792
   topLimit: 1.88
+  offset: {x: 0.4, y: 0}
 --- !u!81 &2062337304
 AudioListener:
   m_ObjectHideFlags: 0
