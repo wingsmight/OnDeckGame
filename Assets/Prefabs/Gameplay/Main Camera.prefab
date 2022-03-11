@@ -772,7 +772,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8723529446875685646, guid: 56719820f2eb34895a456394dac13471, type: 3}
       propertyPath: m_SortingLayer
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8723529446875685646, guid: 56719820f2eb34895a456394dac13471, type: 3}
       propertyPath: m_SortingOrder
@@ -780,7 +780,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8723529446875685646, guid: 56719820f2eb34895a456394dac13471, type: 3}
       propertyPath: m_SortingLayerID
-      value: -878765599
+      value: 249368035
       objectReference: {fileID: 0}
     - target: {fileID: 8723529446947164796, guid: 56719820f2eb34895a456394dac13471, type: 3}
       propertyPath: m_LocalScale.x
