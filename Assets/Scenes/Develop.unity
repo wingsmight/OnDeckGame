@@ -782,34 +782,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 443818519}
-    - target: {fileID: 6968411575077442821, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 27.299988
-      objectReference: {fileID: 0}
-    - target: {fileID: 6968411575617881641, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6968411575721747316, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
-      propertyPath: m_Value
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6968411575721747316, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
-      propertyPath: m_MinValue
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6968411575721747317, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 41.799988
-      objectReference: {fileID: 0}
     - target: {fileID: 6968411575721747319, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
       propertyPath: boatControl
       value: 
       objectReference: {fileID: 1594050966}
-    - target: {fileID: 6968411576036108712, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -33.099976
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5bd3eff0da6f14eeca13dcd09bdec0a4, type: 3}
 --- !u!114 &1594050966 stripped
