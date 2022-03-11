@@ -873,6 +873,10 @@ PrefabInstance:
       propertyPath: boat
       value: 
       objectReference: {fileID: 294788296}
+    - target: {fileID: 3122568311728859726, guid: b265bbb6e9c4847b4a2654e955db8b11, type: 3}
+      propertyPath: sky
+      value: 
+      objectReference: {fileID: 4517151737411634961}
     - target: {fileID: 4557005748417779464, guid: b265bbb6e9c4847b4a2654e955db8b11, type: 3}
       propertyPath: storm
       value: 
