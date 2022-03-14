@@ -15,9 +15,11 @@ public class WaterGenerator : MonoBehaviour
     #region Settings
     [Header("Settings")]
     [FormerlySerializedAs("waterColor")] [SerializeField] private Color waterColor;
+    [FormerlySerializedAs("topWaterColor")] [SerializeField] private Color topWaterColor;
     [SerializeField] private float longitude = 70.0f;
     [SerializeField] private int nodesPerUnit = 5;
     [SerializeField] private float waterDepth = 20.0f;
+    [SerializeField] private float topWidth = 0.2f;
 
     [Header("Physics")]
     [Range(0, 0.1f)] [SerializeField] private float springConstant = 0.02f;
@@ -36,6 +38,7 @@ public class WaterGenerator : MonoBehaviour
     [SerializeField] private new Camera camera;
     [SerializeField] private PolygonCollider2D polygonCollider;
     [SerializeField] private MeshRenderer meshRenderer;
+    [SerializeField] private LineRenderer lineRenderer;
     #endregion
 
     #region Private Variables
@@ -62,6 +65,7 @@ public class WaterGenerator : MonoBehaviour
         mesh = new Mesh();
         startPointOffset = transform.position;
         transform.position = new Vector3(0, disturbance, 0);
+        lineRenderer.transform.position += (Vector3)startPointOffset;
     }
     private void Start()
     {
@@ -81,6 +85,7 @@ public class WaterGenerator : MonoBehaviour
         ProcessInteractionQueue();
 
         DrawBody();
+        DrawTop();
     }
     private void OnTriggerStay2D(Collider2D other)
     {
@@ -635,6 +640,14 @@ public class WaterGenerator : MonoBehaviour
 
         mesh.RecalculateNormals();
         GetComponent<MeshFilter>().mesh = mesh;
+    }
+    private void DrawTop()
+    {
+        lineRenderer.startWidth = lineRenderer.endWidth = topWidth;
+        lineRenderer.startColor = lineRenderer.endColor = topWaterColor;
+        lineRenderer.positionCount = meshVertices.Length;
+        lineRenderer.SetPositions(meshVertices);
+        //lineRenderer.SetPositions(meshVertices.Select(x => new Vector3(x.x, x.y + transform.position.y, x.z)).ToArray());
     }
     #endregion
 
