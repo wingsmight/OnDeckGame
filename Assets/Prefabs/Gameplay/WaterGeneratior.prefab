@@ -214,19 +214,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   STANDARD_DRAG: 2
-  waterColor: {r: 0.21568628, g: 0.56078434, b: 0.93333334, a: 0.5176471}
   topWaterColor: {r: 0.5647059, g: 0.78431374, b: 0.8117647, a: 0.69803923}
   longitude: 50
   nodesPerUnit: 3
   waterDepth: 5
   topWidth: 0.2
+  sortingLayerName: Water
+  sortingOrder: 10
   springConstant: 0
   damping: 0
   spreadRatio: 0.33
   spreadSpeed: 8
   amplitude: 0.5
   disturbance: 0.1
-  buoyancyForce: 12
+  buoyancyForce: 10
   depthForce: 0.2
   airDrag: 1
   airGravityScale: 1.2
@@ -234,6 +235,7 @@ MonoBehaviour:
   polygonCollider: {fileID: 7131986273737513096}
   meshRenderer: {fileID: 7131986273737513093}
   lineRenderer: {fileID: 7138130616294016076}
+  meshFilter: {fileID: 7131986273737513097}
 --- !u!249 &7131986273737513092
 AreaEffector2D:
   serializedVersion: 2
@@ -273,7 +275,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 480e870f3179f4a408bc4d780f3488ba, type: 2}
+  - {fileID: 2100000, guid: 7c81d580e284f4409b7c25bbd12b86e4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

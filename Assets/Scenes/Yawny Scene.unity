@@ -200,7 +200,7 @@ PrefabInstance:
       objectReference: {fileID: 443818519}
     - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: buoyancyForce
-      value: 10
+      value: 11.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
@@ -386,21 +386,9 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 383374911}
     m_Modifications:
-    - target: {fileID: 3922832831126708945, guid: 956d6eb2119624911897cd7f2b27bad3, type: 3}
-      propertyPath: m_SortingLayer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 3922832831126708945, guid: 956d6eb2119624911897cd7f2b27bad3, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 685698221
-      objectReference: {fileID: 0}
     - target: {fileID: 5507976651717583630, guid: 956d6eb2119624911897cd7f2b27bad3, type: 3}
       propertyPath: m_Name
       value: BasicBoat
-      objectReference: {fileID: 0}
-    - target: {fileID: 5507976651717583630, guid: 956d6eb2119624911897cd7f2b27bad3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5507976651717583631, guid: 956d6eb2119624911897cd7f2b27bad3, type: 3}
       propertyPath: m_RootOrder
@@ -1262,6 +1250,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
+--- !u!1 &2051544857 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4517151737840248089, guid: 6bf0251a61da0474996a2d5fc1e15681, type: 3}
+  m_PrefabInstance: {fileID: 4517151737411634959}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2072705189
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1501,6 +1494,10 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 220031650}
+    - target: {fileID: 1239653407, guid: 6bf0251a61da0474996a2d5fc1e15681, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 294788298}
     - target: {fileID: 1971964118, guid: 6bf0251a61da0474996a2d5fc1e15681, type: 3}
       propertyPath: m_SortingLayer
       value: 4
@@ -1840,6 +1837,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 359611871, guid: 06c69953844ad46c2915ed6c698004f8, type: 3}
+      propertyPath: camera
+      value: 
+      objectReference: {fileID: 2051544857}
     - target: {fileID: 359611871, guid: 06c69953844ad46c2915ed6c698004f8, type: 3}
       propertyPath: parallaxEffect
       value: -3.5
