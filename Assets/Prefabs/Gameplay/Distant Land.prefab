@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 0}
-  parallaxEffect: -0.33
+  parallaxEffect: -3.01
 --- !u!331 &1571684123
 SpriteMask:
   m_ObjectHideFlags: 0
