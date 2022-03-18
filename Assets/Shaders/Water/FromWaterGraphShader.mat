@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Water
-  m_Shader: {fileID: 4800000, guid: 0882dcdb19fae974d8c669fc96f83936, type: 3}
+  m_Name: FromWaterGraphShader
+  m_Shader: {fileID: -6465566751694194690, guid: c7861015ed3d6467eb1020032ac7a578, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -19,6 +19,14 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_0dba8ab2d71646a4a6d8e9fed9ecb5ca:
+        m_Texture: {fileID: 8400000, guid: 8cf5d732bb20c4bbcbe3d994e9959645, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_1e42b595358f48ca91899d2e505fc491:
+        m_Texture: {fileID: 2800000, guid: 18f9a993273b74863b0c59198d0ed07d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _AlphaTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -48,16 +56,18 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_56BE0FD1: 1
-    - Vector1_5CB84537: 0
-    - Vector1_745B9376: 0
-    - Vector1_8DA20226: 0
-    - Vector1_AE30F744: 0.5
-    - Vector1_AF318A03: 0
+    - Vector1_1ef38d0b122c45d8b1ae349abc895226: 0.5
+    - Vector1_715db2fd427a4caba5890de13134e9d0: 1
+    - Vector1_a1f080dab5134094ac68cd96d39572b3: 0.1
+    - Vector1_b88d48cb790743f3ba017dce8ec8d547: 1
+    - Vector1_c180c6a1b2c1418c95da1983123b29dd: 1
     - _EnableExternalAlpha: 0
     m_Colors:
-    - Color_234C1B0B: {r: 0.5872642, g: 0.76221895, b: 0.7830189, a: 0}
-    - Color_D12BF231: {r: 0.16838734, g: 0.67246956, b: 0.8301887, a: 1}
+    - Color_b172d8e6b93943eeb143c6f72ed3ac62: {r: 0.6966447, g: 0.8391996, b: 0.9528302, a: 0.42745098}
+    - Vector2_0968a943e10c46d39d42ab0752ebce01: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_2b254a4ca4c04ba2b63e305cbd2e6a8e: {r: 0, g: 0, b: 0, a: 0}
+    - Vector2_2bfabfac193f4fb697149734d069b36e: {r: 1, g: 1, b: 0, a: 0}
+    - Vector2_d11292de59d849c0bdbb999fa9062df4: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}

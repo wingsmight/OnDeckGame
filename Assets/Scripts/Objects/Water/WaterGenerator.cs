@@ -14,12 +14,14 @@ public class WaterGenerator : MonoBehaviour
 
     #region Settings
     [Header("Settings")]
-    [FormerlySerializedAs("waterColor")] [SerializeField] private Color waterColor;
     [FormerlySerializedAs("topWaterColor")] [SerializeField] private Color topWaterColor;
     [SerializeField] private float longitude = 70.0f;
     [SerializeField] private int nodesPerUnit = 5;
     [SerializeField] private float waterDepth = 20.0f;
     [SerializeField] private float topWidth = 0.2f;
+    [Header("SortingLayer")]
+    [SerializeField] private string sortingLayerName = "Water";
+    [SerializeField] private int sortingOrder = 10;
 
     [Header("Physics")]
     [Range(0, 0.1f)] [SerializeField] private float springConstant = 0.02f;
@@ -39,6 +41,7 @@ public class WaterGenerator : MonoBehaviour
     [SerializeField] private PolygonCollider2D polygonCollider;
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private MeshFilter meshFilter;
     #endregion
 
     #region Private Variables
@@ -57,6 +60,7 @@ public class WaterGenerator : MonoBehaviour
     private float time = 0;
     private Vector2 startPointOffset;
     private Mesh mesh;
+    private Rect sizeRect;
     #endregion
 
     #region MonoBehaviour Functions
@@ -72,6 +76,7 @@ public class WaterGenerator : MonoBehaviour
         ComputeCoeficients();
         InitializeStructures();
         InitializeSurface();
+        CalculateCameraRect();
     }
     private void Update()
     {
@@ -266,6 +271,12 @@ public class WaterGenerator : MonoBehaviour
         }
 
         return (p1, p2);
+    }
+    private void CalculateCameraRect()
+    {
+        var min = camera.ViewportToWorldPoint(camera.rect.min);
+        Vector2 size = camera.ViewportToWorldPoint(camera.rect.max) - min;
+        sizeRect = new Rect(min, size);
     }
     private List<int> SplitIntoTriangles(List<Vector2> vertices)
     {
@@ -616,14 +627,16 @@ public class WaterGenerator : MonoBehaviour
     }
     private void DrawBody()
     {
+        CalculateCameraRect();
+
         for (int i = 0; i < nodes.Count; i++)
         {
             meshVertices[i] = nodes[i].position - new Vector2(0, transform.position.y);
             meshVertices[meshVertices.Length - i - 1] = new Vector2(nodes[i].position.x, -waterDepth);
         }
 
-        meshRenderer.sortingLayerName = "Water";
-        meshRenderer.sortingOrder = 10;
+        meshRenderer.sortingLayerName = sortingLayerName;
+        meshRenderer.sortingOrder = sortingOrder;
 
         polygonCollider.SetPath(0, meshVertices.Select(x => new Vector2(x.x, x.y)).ToList());
         polygonCollider.offset = startPointOffset;
@@ -631,15 +644,35 @@ public class WaterGenerator : MonoBehaviour
         mesh.Clear();
         mesh = polygonCollider.CreateMesh(true, true);
 
-        var meshColors = new Color[mesh.vertexCount];
-        for (int i = 0; i < mesh.vertexCount; i++)
+        int pointCount = polygonCollider.GetTotalPointCount();
+        Vector2[] points = polygonCollider.points.Select(x => x + polygonCollider.offset).ToArray();
+        Vector3[] vertices = new Vector3[pointCount];
+        Vector2[] uv = new Vector2[pointCount];
+        for (int j = 0; j < pointCount; j++)
         {
-            meshColors[i] = waterColor;
+            Vector2 actual = points[j];
+            vertices[j] = new Vector3(actual.x, actual.y, 0);
+            uv[j] = new Vector2(Mathf.InverseLerp(sizeRect.xMin, sizeRect.xMax, actual.x),
+                                Mathf.InverseLerp(sizeRect.yMin, sizeRect.yMax, actual.y));
         }
-        mesh.colors = meshColors;
 
-        mesh.RecalculateNormals();
-        GetComponent<MeshFilter>().mesh = mesh;
+        int[] indices = new int[pointCount * 3];
+        for (int i = 0, z = 0; i + 5 < indices.Length; i += 6, z++)
+        {
+            indices[i + 0] = z + 0;
+            indices[i + 1] = vertices.Length - 1 - z;
+            indices[i + 2] = z + 1;
+
+            indices[i + 3] = z + 1;
+            indices[i + 4] = vertices.Length - 1 - z;
+            indices[i + 5] = vertices.Length - 2 - z;
+        }
+
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.triangles = indices;
+
+        meshFilter.mesh = mesh;
     }
     private void DrawTop()
     {
@@ -647,7 +680,6 @@ public class WaterGenerator : MonoBehaviour
         lineRenderer.startColor = lineRenderer.endColor = topWaterColor;
         lineRenderer.positionCount = meshVertices.Length;
         lineRenderer.SetPositions(meshVertices);
-        //lineRenderer.SetPositions(meshVertices.Select(x => new Vector3(x.x, x.y + transform.position.y, x.z)).ToArray());
     }
     #endregion
 
@@ -655,14 +687,38 @@ public class WaterGenerator : MonoBehaviour
     private void OnDrawGizmos()
     {
 #if UNITY_EDITOR
-        Gizmos.color = waterColor;
-        Gizmos.DrawLine(
-            transform.position - Vector3.right * longitude / 2,
-            transform.position + Vector3.right * longitude / 2);
+        Gizmos.color = topWaterColor;
+
         Gizmos.DrawCube(
             transform.position + Vector3.down * waterDepth / 2,
-            Vector3.right * longitude + Vector3.down * waterDepth
+            Vector2.right * longitude + Vector2.down * waterDepth
         );
+
+        int nodeAmount = ((int)(longitude * nodesPerUnit));
+        positionDelta = 1f / nodesPerUnit;
+        var offsetX = Time.time;
+        var gizmosNodes = new List<Vector2>(nodeAmount);
+        for (int count = 0; count <= nodeAmount / 2; count++)
+        {
+            Vector2 rightPosition = (Vector2)transform.position + Vector2.right * (positionDelta * count);
+            Vector2 leftPosition = (Vector2)transform.position + Vector2.left * (positionDelta * count);
+
+            gizmosNodes.Add(rightPosition);
+            if (count > 0)
+            {
+                gizmosNodes.Insert(0, leftPosition);
+            }
+        }
+        for (int i = 0; i < nodeAmount; i++)
+        {
+            var positionX = gizmosNodes[i].x;
+            var positionY = GetWavePoint(positionX + offsetX);
+            gizmosNodes[i] = new Vector2(positionX, positionY) + (Vector2)transform.position;
+        }
+        for (int i = 0; i < gizmosNodes.Count - 1; i++)
+        {
+            Gizmos.DrawLine(gizmosNodes[i], gizmosNodes[i + 1]);
+        }
 #endif
     }
     #endregion
