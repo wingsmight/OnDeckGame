@@ -57,19 +57,28 @@ TagManager:
   - name: Distant Land
     uniqueID: 3975710543
     locked: 0
-  - name: Land
+  - name: Background
+    uniqueID: 1338702021
+    locked: 0
+  - name: Foreground
     uniqueID: 2332663167
     locked: 0
-  - name: Land Objects
+  - name: Foreground Objects
     uniqueID: 452904293
     locked: 0
   - name: Floor
     uniqueID: 1863160639
     locked: 0
+  - name: Floor Objects
+    uniqueID: 4246742591
+    locked: 0
+  - name: Water Top
+    uniqueID: 1588619895
+    locked: 0
   - name: Water
     uniqueID: 685698221
     locked: 0
-  - name: Foreground
+  - name: Frontal
     uniqueID: 1411021701
     locked: 0
   - name: UI

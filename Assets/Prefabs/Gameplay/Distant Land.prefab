@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6817621328817383712}
   - component: {fileID: 6817621328817383713}
-  - component: {fileID: 359611871}
   - component: {fileID: 1571684123}
   m_Layer: 0
   m_Name: Distant Land_1
@@ -84,20 +83,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &359611871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6817621328817383726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2433c067a0d247c19387740e4b2cb86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  camera: {fileID: 0}
-  parallaxEffect: -3.01
 --- !u!331 &1571684123
 SpriteMask:
   m_ObjectHideFlags: 0
@@ -157,6 +142,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6817621329354356790}
+  - component: {fileID: 3956565025070263801}
   m_Layer: 0
   m_Name: Distant Land
   m_TagString: Untagged
@@ -179,3 +165,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3956565025070263801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6817621329354356791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2433c067a0d247c19387740e4b2cb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 0}
+  parallaxEffect: -3.63
