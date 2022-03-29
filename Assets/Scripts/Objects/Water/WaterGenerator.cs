@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 [RequireComponent(typeof(MeshFilter), typeof(PolygonCollider2D))]
 public class WaterGenerator : MonoBehaviour
 {
-    #region Settings
+    #region Constants
     [SerializeField] private float STANDARD_DRAG = 1.05f;
     #endregion
 
@@ -42,6 +42,7 @@ public class WaterGenerator : MonoBehaviour
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private MeshFilter meshFilter;
+    [SerializeField] private ObjectPool splashPool;
     #endregion
 
     #region Private Variables
@@ -91,6 +92,19 @@ public class WaterGenerator : MonoBehaviour
 
         DrawBody();
         DrawTop();
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        var collisionPosition = new Vector2(other.transform.position.x, GetWavePoint(other.transform.position.x) + topWidth) + startPointOffset;
+
+        var splashPaticle = splashPool.Pull();
+
+        splashPaticle.GameObject.SetActive(true);
+        splashPaticle.GameObject.transform.position = collisionPosition;
+        splashPaticle.GameObject.GetComponent<WaterSplash>().Play(other.attachedRigidbody.velocity.magnitude);
+
+        DelayExecutor.Instance.Execute(() => splashPool.Push(splashPaticle),
+            splashPaticle.GameObject.GetComponent<ParticleSystem>().main.duration);
     }
     private void OnTriggerStay2D(Collider2D other)
     {

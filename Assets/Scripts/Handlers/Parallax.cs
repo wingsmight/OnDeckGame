@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Parallax : MonoBehaviour
 {
-    [SerializeField] private new Transform cameraTransofrm;
+    [SerializeField] private Transform cameraTransform;
     [SerializeField] private float parallaxEffect;
 
 
@@ -13,11 +13,11 @@ public class Parallax : MonoBehaviour
     private void Awake()
     {
         startPositionX = transform.position.x;
-        startCameraPositionX = cameraTransofrm.position.x;
+        startCameraPositionX = cameraTransform.position.x;
     }
     private void Update()
     {
-        float offset = (cameraTransofrm.transform.position.x - startCameraPositionX) * parallaxEffect;
+        float offset = (cameraTransform.transform.position.x - startCameraPositionX) * parallaxEffect;
 
         transform.position = new Vector3(startPositionX + offset, transform.position.y, transform.position.z);
     }
