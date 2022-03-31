@@ -12,7 +12,6 @@ public class Storm : MonoBehaviour
     [SerializeField] private float amplitudeSpeedSpread;
     [SerializeField] [Range(0.0f, 100.0f)] private float chance = 50.0f;
     [SerializeField] private Wind wind;
-    [SerializeField] private LocationGeneration locationGeneration;
     [SerializeField] private Boat boat;
     [SerializeField] private Sky sky;
     [SerializeField] private Animator stormySkyAnimator;
@@ -57,7 +56,6 @@ public class Storm : MonoBehaviour
         isEnabled = true;
         wind.StartSwitchBehaviour();
         enabledDistance = boat.transform.position.x;
-        locationGeneration.Hide();
         stormySkyAnimator.Play("Show", 0, 0);
 
         if (enableCoroutine != null)
@@ -73,8 +71,6 @@ public class Storm : MonoBehaviour
         wind.StopSwitchBehaviour();
         stormySkyAnimator.StopPlayback();
 
-        locationGeneration.Shift(enabledDistance);
-        locationGeneration.Show();
         canBeEnabled = false;
 
         StartCoroutine(ReturnToDefaultAmplitude());

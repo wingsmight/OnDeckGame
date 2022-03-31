@@ -1643,6 +1643,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4517151737411634960}
     - target: {fileID: 1966932096658752013, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
+      propertyPath: amplitudeSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1966932096658752013, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
       propertyPath: waterGenerator
       value: 
       objectReference: {fileID: 213190823}
@@ -1653,6 +1657,18 @@ PrefabInstance:
     - target: {fileID: 1966932096658752013, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
       propertyPath: locationGeneration
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1966932096658752013, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
+      propertyPath: amplitudeSpan.start
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1966932096658752013, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
+      propertyPath: amplitudeSpan.finish
+      value: 5.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1966932096658752013, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
+      propertyPath: amplitudeSpeedSpread
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1966932096658752014, guid: 1788054f5757742cbbb03afa1b9c39a2, type: 3}
       propertyPath: m_Name
