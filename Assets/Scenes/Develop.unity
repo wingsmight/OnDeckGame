@@ -247,6 +247,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1067955755}
     - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: splashPool
+      value: 
+      objectReference: {fileID: 1175501626}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: uvOffset.y
       value: 0
       objectReference: {fileID: 0}
@@ -637,6 +641,17 @@ MeshFilter:
   m_CorrespondingSourceObject: {fileID: 7131986273737513097, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
   m_PrefabInstance: {fileID: 213190822}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1175501626 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1481841303, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+  m_PrefabInstance: {fileID: 213190822}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470099272c9db41bb85581f7efe5b9a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!20 &1239653408 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 1239653408, guid: 6bf0251a61da0474996a2d5fc1e15681, type: 3}

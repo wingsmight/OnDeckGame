@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: capacity
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513093, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c81d580e284f4409b7c25bbd12b86e4, type: 2}
     - target: {fileID: 7131986273737513099, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -183,16 +187,92 @@ PrefabInstance:
       value: WaterGenerator
       objectReference: {fileID: 0}
     - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: a
+      value: 2.115106
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: c
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: x
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: phi
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: minC
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: omega
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: camera
       value: 
       objectReference: {fileID: 443818519}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: lambda
+      value: 0.58
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: offestX
+      value: 4.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: xOffset
+      value: -13
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: amplitude
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: amplitude1
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: cMagnitude
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: splashPool
       value: 
       objectReference: {fileID: 1481841303}
     - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: waterDepth
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: xMagnitude
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: disturbance
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: cOffsetOverY
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: buoyancyForce
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: testMultiplier
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7138130616294016076, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: m_SortingLayer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7138130616294016076, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 685698221
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
@@ -1734,6 +1814,10 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 220031650}
+    - target: {fileID: 1239653406, guid: 6bf0251a61da0474996a2d5fc1e15681, type: 3}
+      propertyPath: m_RenderShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1239653407, guid: 6bf0251a61da0474996a2d5fc1e15681, type: 3}
       propertyPath: target
       value: 
@@ -1838,6 +1922,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 664495546}
     m_Modifications:
+    - target: {fileID: 2870530009583970107, guid: 326c1c44aca7b49e8a2d6378308e2485, type: 3}
+      propertyPath: sinkMass
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4670271658352429065, guid: 326c1c44aca7b49e8a2d6378308e2485, type: 3}
       propertyPath: m_Name
       value: Log_1

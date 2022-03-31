@@ -24,10 +24,6 @@ public class WaterGenerator : MonoBehaviour
     [SerializeField] private int sortingOrder = 10;
 
     [Header("Physics")]
-    [Range(0, 0.1f)] [SerializeField] private float springConstant = 0.02f;
-    [Range(0, 0.1f)] [SerializeField] private float damping = 0.02f;
-    [Range(0.0f, .5f)] [SerializeField] private float spreadRatio = 0.33f;
-    [Range(1, 10)] [SerializeField] private int spreadSpeed = 8;
     [Range(0.1f, 10.0f)] [SerializeField] private float amplitude = 1.0f;
     [Range(0.0f, 5.0f)] [SerializeField] private float disturbance = 0.4f;
     [Range(0.0f, 50.0f)] [SerializeField] private float buoyancyForce = 10.0f;
@@ -47,19 +43,11 @@ public class WaterGenerator : MonoBehaviour
 
     #region Private Variables
     private List<WaterNode> nodes = new List<WaterNode>();
-
-    private float[] leftDeltas;
-    private float[] rightDeltas;
-
     private Vector3[] meshVertices;
-    private Vector2[] colliderPath;
-    private int[] meshTriangles;
-
     private float positionDelta;
-    private float massPerNode;
     private Queue<Collider2D> interactionQueue = new Queue<Collider2D>();
     private float time = 0;
-    private Vector2 startPointOffset;
+    //private Vector2 startPointOffset;
     private Mesh mesh;
     private Rect sizeRect;
     #endregion
@@ -68,9 +56,6 @@ public class WaterGenerator : MonoBehaviour
     private void Awake()
     {
         mesh = new Mesh();
-        startPointOffset = transform.position;
-        transform.position = new Vector3(0, disturbance, 0);
-        lineRenderer.transform.position += (Vector3)startPointOffset;
     }
     private void Start()
     {
@@ -85,8 +70,8 @@ public class WaterGenerator : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
-        GenerateWaves(time);
+        //time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
+        GenerateWaves();
 
         ProcessInteractionQueue();
 
@@ -95,7 +80,7 @@ public class WaterGenerator : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        var collisionPosition = new Vector2(other.transform.position.x, GetWavePoint(other.transform.position.x) + topWidth) + startPointOffset;
+        var collisionPosition = new Vector2(other.transform.position.x, GetWavePoint(other.transform.position.x) + topWidth);// + startPointOffset;
 
         var splashPaticle = splashPool.Pull();
 
@@ -127,9 +112,24 @@ public class WaterGenerator : MonoBehaviour
         other.attachedRigidbody.drag = airDrag;// * STANDARD_DRAG * crossArea;
         other.attachedRigidbody.gravityScale = airGravityScale;
     }
+    [SerializeField] private float xOffset;
+    [SerializeField] private float minC;
+    [SerializeField] private float xMagnitude;
+    [SerializeField] private float cMagnitude;
     public float GetWavePoint(float x)
     {
-        return amplitude * Mathf.Sin(x);
+        x -= camera.transform.position.x;
+        x += xOffset;
+        x += Mathf.Sin(Time.time) * xMagnitude;
+        x = -x;
+        if (x == 0.0f)
+        {
+            x = Mathf.Epsilon;
+        }
+
+        float a = Mathf.Sin(Time.time) * amplitude;
+        float c = (Time.time % Mathf.PI) / cMagnitude + minC;
+        return (a / x) * Mathf.Sin((2 * Mathf.PI / c) * x) + transform.position.y;
     }
 
     private void ProcessInteractionQueue()
@@ -192,7 +192,8 @@ public class WaterGenerator : MonoBehaviour
         float crossArea = (normal * other.bounds.size).magnitude;
         float referencePoint = (leftNode.position.y + rightNode.position.y) / 2.0f;
         float depth = referencePoint - centroid.y;
-        rb.drag = STANDARD_DRAG * crossArea * (1 - Mathf.Clamp01(depth * depthForce));
+
+        rb.drag = Mathf.Clamp(STANDARD_DRAG * crossArea * (1 - Mathf.Clamp01(depth * depthForce)), 0.01f, float.PositiveInfinity);
         rb.gravityScale = 1.0f;
 
         if (volume != 0 && !float.IsNaN(centroid.x) && !float.IsNaN(centroid.y))
@@ -424,7 +425,6 @@ public class WaterGenerator : MonoBehaviour
     private void ComputeCoeficients()
     {
         positionDelta = 1f / nodesPerUnit;
-        massPerNode = (1f / nodesPerUnit) * waterDepth;
     }
     #endregion
 
@@ -472,6 +472,7 @@ public class WaterGenerator : MonoBehaviour
             nodes.Insert(0, cycledNode);
 
             time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
+
         }
     }
     private void PlaceNodesForward()
@@ -493,7 +494,7 @@ public class WaterGenerator : MonoBehaviour
             time = (time + Time.fixedDeltaTime) % (2 * Mathf.PI);
         }
     }
-    private void GenerateWaves(float offsetX)
+    private void GenerateWaves(float offsetX = 0.0f)
     {
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -502,116 +503,6 @@ public class WaterGenerator : MonoBehaviour
             nodes[i].position = new Vector2(positionX, positionY);
         }
     }
-    private void ApplySpringForces()
-    {
-        for (int i = 0; i < nodes.Count; i++)
-        {
-            if (i < nodes.Count - 1)
-                nodes[i].Update(springConstant, damping, massPerNode);
-        }
-    }
-    private void PropagateWaves()
-    {
-        // do some passes where nodes pull on their neighbours
-        for (int j = 0; j < spreadSpeed; j++)
-        {
-            for (int i = nodes.Count - 1; i >= 0; i--)
-            {
-                if (i > 0)
-                {
-                    leftDeltas[i] = spreadRatio * (nodes[i].position.y - nodes[i - 1].position.y);
-                    nodes[i - 1].velocity += leftDeltas[i];
-                }
-                if (i < nodes.Count - 1)
-                {
-                    rightDeltas[i] = spreadRatio * (nodes[i].position.y - nodes[i + 1].position.y);
-                    nodes[i + 1].velocity += rightDeltas[i];
-                }
-            }
-
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                if (i > 0)
-                    nodes[i - 1].position.y += leftDeltas[i] * Time.fixedDeltaTime;
-                if (i < nodes.Count - 1)
-                    nodes[i + 1].position.y += rightDeltas[i] * Time.fixedDeltaTime;
-            }
-        }
-    }
-    private void ReactToCollisions()
-    {
-        Dictionary<Collider2D, List<WaterNode>> splashedNodes = new Dictionary<Collider2D, List<WaterNode>>();
-
-        LayerMask mask;
-        if (gameObject.layer == LayerMask.NameToLayer("Back Water"))
-            mask = LayerMask.GetMask("Back Entities");
-        else
-            mask = LayerMask.GetMask("Default");
-
-        foreach (WaterNode node in nodes)
-        {
-            Collider2D splasher = Physics2D.OverlapCircle(
-                node.position + Vector2.down * positionDelta,
-                positionDelta,
-                mask
-            );
-
-            if (splasher != null)
-            {
-                if (!splashedNodes.ContainsKey(splasher))
-                    splashedNodes.Add(splasher, new List<WaterNode>());
-
-                splashedNodes[splasher].Add(node);
-            }
-        }
-
-        float massPerSplash;
-        float velocity;
-        foreach (Collider2D splasher in splashedNodes.Keys)
-        {
-            massPerSplash = splasher.attachedRigidbody.mass / splashedNodes[splasher].Count;
-            velocity = splasher.attachedRigidbody.velocity.y;
-
-            foreach (WaterNode node in splashedNodes[splasher])
-                node.Splash(massPerSplash, velocity, massPerNode);
-        }
-    }
-    private void ReactToCollision(Collider2D splasher)
-    {
-        int start = Mathf.FloorToInt((splasher.bounds.center.x - splasher.bounds.extents.x) - nodes[0].position.x) * nodesPerUnit;
-        int end = Mathf.CeilToInt((splasher.bounds.center.x + splasher.bounds.extents.x) - nodes[0].position.x) * nodesPerUnit;
-
-        start = start >= 0 ? start : 0;
-        end = end < nodes.Count ? end : nodes.Count - 1;
-
-        LayerMask mask;
-        if (gameObject.layer == LayerMask.NameToLayer("Back Water"))
-            mask = LayerMask.GetMask("Back Entities");
-        else
-            mask = LayerMask.GetMask("Default");
-
-        float splasherMass = splasher.attachedRigidbody.mass;
-        float massPerSplash = splasherMass / (end - start);
-        Vector2 velocity = splasher.attachedRigidbody.velocity;
-
-        for (int i = start; i <= end; i++)
-        {
-            bool splashed = Physics2D.OverlapCircle(
-                nodes[i].position + Vector2.down * positionDelta,
-                positionDelta,
-                mask
-            );
-
-            if (splashed)
-                velocity.y += nodes[i].Splash(massPerSplash, velocity.y, massPerNode) * massPerSplash / splasher.attachedRigidbody.mass;
-        }
-
-        if (!float.IsNaN(velocity.x) && !float.IsNaN(velocity.y))
-            splasher.attachedRigidbody.velocity = velocity;
-    }
-    #endregion
-
-    #region Draw Functions
     private void InitializeSurface()
     {
         int nodeAmount = ((int)(longitude * nodesPerUnit));
@@ -634,18 +525,18 @@ public class WaterGenerator : MonoBehaviour
     {
         int nodeAmount = ((int)(longitude * nodesPerUnit)) + 1;
 
-        leftDeltas = new float[nodeAmount];
-        rightDeltas = new float[nodeAmount];
-
         meshVertices = new Vector3[nodeAmount * 2];
     }
+    #endregion
+
+    #region Draw Functions
     private void DrawBody()
     {
         CalculateCameraRect();
 
         for (int i = 0; i < nodes.Count; i++)
         {
-            meshVertices[i] = nodes[i].position - new Vector2(0, transform.position.y);
+            meshVertices[i] = nodes[i].position - (Vector2)transform.position;
             meshVertices[meshVertices.Length - i - 1] = new Vector2(nodes[i].position.x, -waterDepth);
         }
 
@@ -653,21 +544,21 @@ public class WaterGenerator : MonoBehaviour
         meshRenderer.sortingOrder = sortingOrder;
 
         polygonCollider.SetPath(0, meshVertices.Select(x => new Vector2(x.x, x.y)).ToList());
-        polygonCollider.offset = startPointOffset;
 
         mesh.Clear();
         mesh = polygonCollider.CreateMesh(true, true);
 
         int pointCount = polygonCollider.GetTotalPointCount();
-        Vector2[] points = polygonCollider.points.Select(x => x + polygonCollider.offset).ToArray();
+        Vector2[] points = polygonCollider.points.ToArray();
         Vector3[] vertices = new Vector3[pointCount];
         Vector2[] uv = new Vector2[pointCount];
         for (int j = 0; j < pointCount; j++)
         {
-            Vector2 actual = points[j];
-            vertices[j] = new Vector3(actual.x, actual.y, 0);
-            uv[j] = new Vector2(Mathf.InverseLerp(sizeRect.xMin, sizeRect.xMax, actual.x),
-                                Mathf.InverseLerp(sizeRect.yMin, sizeRect.yMax, actual.y));
+            Vector2 actual = points[j] + (Vector2)transform.position;
+            vertices[j] = new Vector3(Mathf.Clamp(actual.x, sizeRect.xMin, sizeRect.xMax),
+                                        Mathf.Clamp(actual.y, sizeRect.yMin, sizeRect.yMax) - transform.position.y, 0);
+            uv[j] = new Vector2(Mathf.InverseLerp(sizeRect.xMin, sizeRect.xMax, vertices[j].x),
+                                Mathf.InverseLerp(sizeRect.yMin, sizeRect.yMax, vertices[j].y + transform.position.y));
         }
 
         int[] indices = new int[pointCount * 3];
@@ -710,7 +601,6 @@ public class WaterGenerator : MonoBehaviour
 
         int nodeAmount = ((int)(longitude * nodesPerUnit));
         positionDelta = 1f / nodesPerUnit;
-        var offsetX = Time.time;
         var gizmosNodes = new List<Vector2>(nodeAmount);
         for (int count = 0; count <= nodeAmount / 2; count++)
         {
@@ -726,8 +616,8 @@ public class WaterGenerator : MonoBehaviour
         for (int i = 0; i < nodeAmount; i++)
         {
             var positionX = gizmosNodes[i].x;
-            var positionY = GetWavePoint(positionX + offsetX);
-            gizmosNodes[i] = new Vector2(positionX, positionY) + (Vector2)transform.position;
+            var positionY = GetWavePoint(positionX);
+            gizmosNodes[i] = new Vector2(positionX, positionY);
         }
         for (int i = 0; i < gizmosNodes.Count - 1; i++)
         {
