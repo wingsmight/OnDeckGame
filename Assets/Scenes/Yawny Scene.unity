@@ -266,6 +266,22 @@ PrefabInstance:
       propertyPath: testMultiplier
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: topWaterColor.a
+      value: 0.8509804
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: topWaterColor.b
+      value: 0.9372549
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: topWaterColor.g
+      value: 0.54901963
+      objectReference: {fileID: 0}
+    - target: {fileID: 7131986273737513103, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
+      propertyPath: topWaterColor.r
+      value: 0.13725491
+      objectReference: {fileID: 0}
     - target: {fileID: 7138130616294016076, guid: 9cd850032bbeb4aa9bd2aac2ba6aa6c2, type: 3}
       propertyPath: m_SortingLayer
       value: 12
